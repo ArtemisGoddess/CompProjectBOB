@@ -54,4 +54,13 @@ This project is a robot that will navigate through mazes made out of tape and ot
 ---
 
 
-## How To Run (Unfinished)
+## How To Run 
+
+### Required Libraries
+-  FastLed
+
+To run the program, run the following commands in the project's directory:
+```bash
+g++ main.cpp -o solve_maze
+./solve_maze
+```
