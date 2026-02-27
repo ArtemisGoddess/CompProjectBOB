@@ -49,7 +49,7 @@ void ultrasonic::crashImminent(int &warning){ // Warning system for if bot is ab
 }
 
 bool ultrasonic::detectWall() {
-    this->wallDetections = crashImminent(this->wallDetections);
+    crashImminent(this->wallDetections);
 
     if (this->wallDetections >= 3){ //Sees enough wall, so theres a wall
         this->wallDetections = 0;

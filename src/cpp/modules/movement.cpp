@@ -30,15 +30,15 @@ void movement::stop() {
 }
 
 void movement::setAngle(float angle, float tolerance) {
-    float posDiff = fmod((angle - getCurrentAngle()), 360.0);
-    float negDiff = fmod((angle + getCurrentAngle()), 360.0);
+    float posDiff = fmod((angle - localGyro.getCurrentAngle()), 360.0);
+    float negDiff = fmod((angle + localGyro.getCurrentAngle()), 360.0);
     uint8_t dir = (abs(negDiff) > abs(posDiff)) ? LOW : HIGH; //Checks which direction is most efficient, and takes it
 
     digitalWrite(PIN_Motor_STEER_R, dir);
     digitalWrite(PIN_Motor_STEER_L, dir ^ 1U); // Bit-flip to go opposite to the right wheels
 
     while (abs(localGyro.getCurrentAngle() - angle) > tolerance) { // While not within the acceptable tolerance range, turn.
-        updateGyroAngle(); //Updates the angle every loop to ensure accuracy.
+        localGyro.updateGyroAngle(); //Updates the angle every loop to ensure accuracy.
 
         int speed = min(max(log((abs(localGyro.getCurrentAngle() - angle) / 5) + 1) * 90, constants::SPEED), 100); //Exponential speed equation, hits SPEED when it gets close the needed value, and maxes out at 100. Makes turning fast.
 

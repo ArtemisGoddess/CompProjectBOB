@@ -10,7 +10,8 @@ lightSensor LightSensor;
 ultrasonic Ultrasonic;
 
 int SINCE_WALL = 0; //Counter since it sees a wall.
-
+int dynamicConstants::COUNT = 0;
+enum dynamicConstants::STATE dynamicConstants::CURRENT_STATE = dynamicConstants::STOP; //Initilizes the current state to be STOP, which waits until button press to DRIVE.
 
 
 
@@ -25,10 +26,10 @@ void setup() {
   digitalWrite(PIN_Motor_SAFTEY, HIGH); // Enable the robot to move
   Serial.begin(9600); // Send information at baud rate 9600
 
-  Gyro = new gyro();
-  Drivetrain = new movement(Gyro);
-  LightSensor = new lightSensor(constants::colorThreshold, Drivetrain);
-  Ultrasonic = new ultrasonic();
+  Gyro = gyro();
+  Drivetrain = movement(Gyro);
+  LightSensor = lightSensor(constants::colorThreshold, Drivetrain);
+  Ultrasonic = ultrasonic();
 }
 
 void loop() { //Main loop function; actual robot running
@@ -53,7 +54,7 @@ void loop() { //Main loop function; actual robot running
       Drivetrain.updateDriveAngle(); //Updates the DRIVE_ANGLE again before moving.
       dynamicConstants::CURRENT_STATE = dynamicConstants::DRIVE; //Changes state
       break;
-    case constants::STOP:
+    case dynamicConstants::STOP:
       Drivetrain.stop(); //Stops the robot from moving.
 
       while (digitalRead(BUTTON) == HIGH) {} //Wait until button press

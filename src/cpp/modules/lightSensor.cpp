@@ -1,6 +1,6 @@
 #include "lightSensor.h"
 
-lightSensor::lightSensor(int* colorThreshold[3], movement &Drivetrain) {
+lightSensor::lightSensor(const int* colorThreshold[3], movement &Drivetrain) {
     this->localDrivetrain = Drivetrain;
     this->colorThreshold = colorThreshold;
 

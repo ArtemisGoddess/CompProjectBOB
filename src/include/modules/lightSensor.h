@@ -5,12 +5,13 @@
 
 class lightSensor {
     private:
-        int* colorThreshold[3];
+        const int** colorThreshold;
 
         movement localDrivetrain;
     public:
+        lightSensor();
         // Light sensor object to interact with detections
-        lightSensor(int* colorThreshold[3], movement &Drivetrain);
+        lightSensor(const int* colorThreshold[3], movement &Drivetrain);
 
         //Follows a line at a given speed and turnStrength.
         void followLine(int speed, int turnStrength);

@@ -24,25 +24,25 @@
 
 class constants {
     public:
-        int SPEED = 60; //Base movement speed
+        static const int SPEED = 60; //Base movement speed
 
-        int dangerDistance = 5;  // Distance in centimeters required to increment warning
+        static const int dangerDistance = 5;  // Distance in centimeters required to increment warning
         
-        CRGB leds[NUM_LEDS]; //Led object
+        static const CRGB leds[NUM_LEDS]; //Led object
 
-        int* colorThreshold[3] = {100, 70, 70}; //Thresholds for seeing lines
+        static const int* colorThreshold[3] = {100, 70, 70}; //Thresholds for seeing lines
 };
 
 class dynamicConstants {
     public:
-        int COUNT = 0;
+        static int COUNT;
 
         enum STATE {
             DRIVE = 0,
-            SEE_WALL,
-            STOP
+            SEE_WALL = 1,
+            STOP = 2
         };
 
-        enum STATE CURRENT_STATE = STOP; //Initilizes the current state to be STOP, which waits until button press to DRIVE.
+        static enum dynamicConstants::STATE CURRENT_STATE;
 
 };
