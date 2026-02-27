@@ -59,8 +59,4 @@ This project is a robot that will navigate through mazes made out of tape and ot
 ### Required Libraries
 -  FastLed
 
-To run the program, run the following commands in the project's directory:
-```bash
-g++ main.cpp -o solve_maze
-./solve_maze
-```
+To run the program, upload the code to your robot and press the black button on the side to make it start driving.
