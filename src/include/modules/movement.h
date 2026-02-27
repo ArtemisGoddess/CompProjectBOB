@@ -8,7 +8,7 @@ class movement {
         float DRIVE_ANGLE = 0; // Angle the robot is driving at
         gyro localGyro;
     public:
-
+        //main movement controller
         movement(gyro &Gyro);
 
         // Drive given speed and if forwards or backwards

@@ -25,8 +25,17 @@
 class constants {
     public:
         int SPEED = 60; //Base movement speed
+
+        int dangerDistance = 5;  // Distance in centimeters required to increment warning
         
         CRGB leds[NUM_LEDS]; //Led object
+
+        int* colorThreshold[3] = {100, 70, 70}; //Thresholds for seeing lines
+};
+
+class dynamicConstants {
+    public:
+        int COUNT = 0;
 
         enum STATE {
             DRIVE = 0,
@@ -35,4 +44,5 @@ class constants {
         };
 
         enum STATE CURRENT_STATE = STOP; //Initilizes the current state to be STOP, which waits until button press to DRIVE.
+
 };
