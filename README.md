@@ -54,9 +54,11 @@ This project is a robot that will navigate through mazes made out of tape and ot
 ---
 
 
-## How To Run 
-
-### Required Libraries
+## Required Libraries
 -  FastLed
+
+It is also required that you extract the libraries.zip into your libraries folder. This is usually located in Arduino/libraries. These are custom libraries made for the robot.
+
+## How To Run 
 
 To run the program, upload the code to your robot and press the black button on the side to make it start driving.
