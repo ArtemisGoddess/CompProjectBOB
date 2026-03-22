@@ -11,6 +11,7 @@ lightSensor* LightSensor;
 ultrasonic* Ultrasonic;
 
 int SINCE_WALL = 0; //Counter since it sees a wall.
+int SINCE_TURN = 0;
 int COUNT = 0;
 
 
@@ -22,6 +23,7 @@ int COUNT = 0;
 enum STATE {
   DRIVE = 0,
   SEE_WALL,
+  SEARCH_WALLS,
   STOP
 };
 
@@ -48,11 +50,15 @@ void loop() { //Main loop function; actual robot running
       Drivetrain->drive(constants::SPEED, true);
       SINCE_WALL--; //Decreases the SINCE_WALL counter, for thje sake of turnByLine.
 
-      if (LightSensor->detectLine()) CURRENT_STATE = SEE_WALL;
       if (Ultrasonic->detectWall()) CURRENT_STATE = STOP;
+      if (LightSensor->detectLine()) CURRENT_STATE = SEE_WALL;
+      if (SINCE_TURN >= constants::detectDistance) CURRENT_STATE = SEARCH_WALLS;
+
+      SINCE_TURN++;
 
       break;
     case SEE_WALL:
+      SINCE_TURN = 0;
       LightSensor->turnByLine(SINCE_WALL);
       Drivetrain->updateDriveAngle(); //Sets the target DRIVE_ANGLE to be the current angle
 
@@ -62,7 +68,14 @@ void loop() { //Main loop function; actual robot running
       Drivetrain->updateDriveAngle(); //Updates the DRIVE_ANGLE again before moving.
       CURRENT_STATE = DRIVE; //Changes state
       break;
+    case SEARCH_WALLS:
+      SINCE_TURN = 0;
+      Drivetrain->turn(90);
+      CURRENT_STATE = DRIVE;
+
+      break;
     case STOP:
+      SINCE_TURN = 0;
       Drivetrain->stop(); //Stops the robot from moving.
 
       while (digitalRead(BUTTON) == HIGH) {} //Wait until button press
