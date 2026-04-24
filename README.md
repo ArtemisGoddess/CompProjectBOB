@@ -1,7 +1,7 @@
 # CompProjectBOB - Description
 
 
-This project is a robot that will navigate through mazes made out of tape and other similar materials.
+This project is a robot that will navigate through mazes made out of tape, bristle board and other similar materials.
 
 
 ---
@@ -30,6 +30,8 @@ This project is a robot that will navigate through mazes made out of tape and ot
 
 - Ultrasonic_sensor.h - contains all functions for the robot's ultrasonic sensor on the front of its 'face.' Functions in this category detect when the robot is in front of a wall and how far from a wall the robot is.
 
+- Constants.h - contains all static constants used by each of the headers and the robot itself. Data in this catagory is made to allow for a streamlined finetuning process.
+
 
 ---
 
@@ -45,7 +47,6 @@ This project is a robot that will navigate through mazes made out of tape and ot
 
 
 ## Future changes
-- Increase the speed that the robot drives at to navigate mazes faster.
 
 
 - Let the robot have happiness.

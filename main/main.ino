@@ -1,8 +1,9 @@
 #include <constants.h>
-#include <gyro.h>
-#include <movement.h>
-#include <lightSensor.h>
-#include <ultrasonic.h>
+#include <gyro.cpp>
+#include <lightsensor.cpp>
+#include <movement.cpp>
+#include <ultrasonic.cpp>
+#include <weewoo.cpp>
 
 
 gyro* Gyro; //Central gyro
@@ -27,7 +28,9 @@ enum STATE {
   STOP
 };
 
+
 enum STATE CURRENT_STATE = STOP; //Initilizes the current state to be STOP, which waits until button press to DRIVE.
+enum STATE PREVIOUS_STATE = CURRENT_STATE; //WORK IN PROGRESS
 
 void setup() {
   pinMode(BUTTON, INPUT_PULLUP);
@@ -37,18 +40,25 @@ void setup() {
   Serial.begin(9600); // Send information at baud rate 9600
 
   Gyro = new gyro();
-  Drivetrain = new movement(Gyro);
-  LightSensor = new lightSensor(constants::colorThreshold, Drivetrain);
   Ultrasonic = new ultrasonic();
+  Drivetrain = new movement(Gyro, Ultrasonic);
+  LightSensor = new lightSensor(constants::colorThreshold, constants::colorThresholdInv, Drivetrain);
 }
 
 void loop() { //Main loop function; actual robot running
   Gyro->updateGyroAngle();
 
-  switch (CURRENT_STATE) { // Drives forward, turns 90 degrees right if it spots a wall, stops if it is on a white line (may or may not work)
+
+  switch (CURRENT_STATE) { // -----------------------------------------------------------
     case DRIVE:
-      Drivetrain->drive(constants::SPEED, true);
+      weeWoo::setRGB(CRGB::Purple);
+      
       SINCE_WALL--; //Decreases the SINCE_WALL counter, for thje sake of turnByLine.
+      SINCE_SECONDARY_WALL--;
+      PREVIOUS_STATE = DRIVE;
+
+      if (Ultrasonic->detectWall()) CURRENT_STATE = SEE_WALL;
+      else if (LightSensor->detectLine()) CURRENT_STATE = LINE_FOLLOWING;
 
       if (Ultrasonic->detectWall()) CURRENT_STATE = STOP;
       if (LightSensor->detectLine()) CURRENT_STATE = SEE_WALL;
@@ -79,10 +89,9 @@ void loop() { //Main loop function; actual robot running
       Drivetrain->stop(); //Stops the robot from moving.
 
       while (digitalRead(BUTTON) == HIGH) {} //Wait until button press
-
+      delay(1000);
       CURRENT_STATE = DRIVE;
       break;
   }
 
-  COUNT++;
 }
