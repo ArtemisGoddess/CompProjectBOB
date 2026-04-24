@@ -1,9 +1,9 @@
-#include <constants.h>
-#include <gyro.cpp>
-#include <lightsensor.cpp>
-#include <movement.cpp>
-#include <ultrasonic.cpp>
-#include <weewoo.cpp>
+#include <../../../../../../../../../../OneDrive/Documents/Arduino/Codes/CompProjectBOB/main/libraries/constants/constants.h>
+#include <../../../../../../../../../../OneDrive/Documents/Arduino/Codes/CompProjectBOB/main/libraries/gyro/gyro.cpp>
+#include <../../../../../../../../../../OneDrive/Documents/Arduino/Codes/CompProjectBOB/main/libraries/lightsensor/lightsensor.cpp>
+#include <../../../../../../../../../../OneDrive/Documents/Arduino/Codes/CompProjectBOB/main/libraries/movement/movement.cpp>
+#include <../../../../../../../../../../OneDrive/Documents/Arduino/Codes/CompProjectBOB/main/libraries/ultrasonic/ultrasonic.cpp>
+#include <../../../../../../../../../../OneDrive/Documents/Arduino/Codes/CompProjectBOB/main/libraries/weewoo/weewoo.cpp>
 
 
 gyro* Gyro; //Central gyro
@@ -12,8 +12,8 @@ lightSensor* LightSensor;
 ultrasonic* Ultrasonic;
 
 int SINCE_WALL = 0; //Counter since it sees a wall.
-int SINCE_TURN = 0;
-int COUNT = 0;
+int SINCE_SECONDARY_WALL = 0;
+int INV_COUNTER = 0;
 
 
 
@@ -24,8 +24,9 @@ int COUNT = 0;
 enum STATE {
   DRIVE = 0,
   SEE_WALL,
-  SEARCH_WALLS,
-  STOP
+  LINE_FOLLOWING,
+  DANCE,
+  STOP,
 };
 
 
@@ -52,40 +53,52 @@ void loop() { //Main loop function; actual robot running
   switch (CURRENT_STATE) { // -----------------------------------------------------------
     case DRIVE:
       weeWoo::setRGB(CRGB::Purple);
-      
+
       SINCE_WALL--; //Decreases the SINCE_WALL counter, for thje sake of turnByLine.
       SINCE_SECONDARY_WALL--;
       PREVIOUS_STATE = DRIVE;
 
       if (Ultrasonic->detectWall()) CURRENT_STATE = SEE_WALL;
       else if (LightSensor->detectLine()) CURRENT_STATE = LINE_FOLLOWING;
+      else if (LightSensor->detectInv() && INV_COUNTER > 0){
+        Drivetrain->turn(180);
+        Drivetrain->updateDriveAngle();
+      } 
 
-      if (Ultrasonic->detectWall()) CURRENT_STATE = STOP;
-      if (LightSensor->detectLine()) CURRENT_STATE = SEE_WALL;
-      if (SINCE_TURN >= constants::detectDistance) CURRENT_STATE = SEARCH_WALLS;
-
-      SINCE_TURN++;
+      Drivetrain->drive(constants::SPEED, true);
 
       break;
-    case SEE_WALL:
-      SINCE_TURN = 0;
-      LightSensor->turnByLine(SINCE_WALL);
+    case SEE_WALL: // -----------------------------------------------------------
+      weeWoo::setRGB(CRGB::Green);
+      Drivetrain->turnProcess();
       Drivetrain->updateDriveAngle(); //Sets the target DRIVE_ANGLE to be the current angle
 
-      Drivetrain->drive(constants::SPEED, false); //Reverses away from the wall for 0.5 seconds.
-      delay(500);
-
-      Drivetrain->updateDriveAngle(); //Updates the DRIVE_ANGLE again before moving.
-      CURRENT_STATE = DRIVE; //Changes state
-      break;
-    case SEARCH_WALLS:
-      SINCE_TURN = 0;
-      Drivetrain->turn(90);
-      CURRENT_STATE = DRIVE;
+      CURRENT_STATE = PREVIOUS_STATE; //Changes state
 
       break;
-    case STOP:
-      SINCE_TURN = 0;
+    case LINE_FOLLOWING: // -----------------------------------------------------------
+      LightSensor->followLine();
+      weeWoo::setRGB(CRGB::Yellow);
+
+      if (LightSensor->detectInv() && INV_COUNTER == 0){
+        INV_COUNTER++;
+        Drivetrain->updateDriveAngleTrue();
+        Drivetrain->drive(constants::SPEED, true);
+        delay(500);
+        Drivetrain->stop();
+        CURRENT_STATE = DRIVE;
+      } 
+      else if (LightSensor->detectInv()) CURRENT_STATE = DANCE;
+
+      break;
+    case DANCE: // -----------------------------------------------------------
+      weeWoo::setRGB(CRGB::HotPink);
+      Drivetrain->dance();
+
+      CURRENT_STATE = STOP;
+    
+    case STOP: // -----------------------------------------------------------
+      weeWoo::setRGB(CRGB::Blue);
       Drivetrain->stop(); //Stops the robot from moving.
 
       while (digitalRead(BUTTON) == HIGH) {} //Wait until button press
